@@ -7,6 +7,11 @@ import RNU from 'react-native-units'
 import { Form, FormItem, Picker } from 'react-native-form-component';
 import RadioForm from 'react-native-radio-form';
 
+//import !!
+import ToggleSwitch from 'toggle-switch-react-native'
+import DatePicker from 'react-native-date-picker'
+//
+
 import styles from './styles/main'
 
 const server = "https://testserver.louisat.repl.co/";
@@ -102,6 +107,109 @@ function App () {
   );
 }
 
+const HomeworkAdd = (props) => { // pass hooks : ?visible
+  const [course,setCourse] = useState("Maths"); // pass default value through props
+  const [title,setTitle] = useState("");
+  const [description,setDescription] = useState("");
+  const [isEval,setIsEval] = useState(false);
+  const [isGraded,setIsGraded] = useState(false);
+  const [date, setDate] = useState(new Date())
+  const [open, setOpen] = useState(false)
+  
+  return(
+    <Modal
+        animationType="slide"
+        transparent={true}
+        visible={props.visible}
+        onRequestClose={() => {
+          props.setVisible(false);
+        }}
+        shouldComponentUpdate={()=>{return false;}}
+      >
+        <View style={styles.centeredView} shouldComponentUpdate={()=>{return false;}}>
+          <View style={styles.modalView} shouldComponentUpdate={()=>{return false;}}>
+            <Text style={styles.modalTitle} >HOMEWORK</Text>
+            <Form 
+              onButtonPress={() => {
+                props.setvisible(false);
+                props.NextSetvisible(true);
+                ///// SEND HOMEWORK
+              }}
+              buttonTextStyle={styles.textStyle}
+              buttonStyle={[styles.button, styles.buttonClose]}
+              buttonText="Add homework"
+              shouldComponentUpdate={()=>{return false;}}
+            >
+              <FormItem
+                textInputStyle={styles.input}
+                labelStyle={styles.label}
+                label="Titre :"
+                isRequired
+                value={title}
+                onChangeText={setTitle}
+              />
+              <Picker
+                items={[...Object.keys(user.spe).filter((k)=>{if(user.spe[k]){return k}}),...troncComnmun,user.langue,user.option].map(n=>{label:n,value:n})} // [{label,value},...]
+                label="Course :"
+                isRequired
+                selectedValue={course}
+                style={styles.input}
+                itemStyle={styles.input}
+                onSelection={item => setCourse(item.value)}
+              />
+              <View> // align horizontaly
+                <ToggleSwitch
+                  isOn={false}
+                  onColor="green"
+                  offColor="red"
+                  label="Eval : "
+                  labelStyle={{ color: "black", fontWeight: "900" }}
+                  size="large"
+                  onToggle={setIsEval}
+                />
+                <ToggleSwitch
+                  isOn={false}
+                  onColor="green"
+                  offColor="red"
+                  label="Noté : "
+                  labelStyle={{ color: "black", fontWeight: "900" }}
+                  size="large"
+                  onToggle={setIsGraded}
+                />
+              </View>
+              <FormItem
+                textInputStyle={styles.input}
+                labelStyle={styles.label}
+                label="Description :"
+                isRequired
+                value={description}
+                onChangeText={setDescription}
+                textArea={true}
+              />
+              <>
+                <Button title="Date :" onPress={() => setOpen(true)} />
+                <DatePicker
+                  modal
+                  open={open}
+                  date={date}
+                  onConfirm={(date) => {
+                    setOpen(false)
+                    setDate(date)
+                  }}
+                  onCancel={() => {
+                    setOpen(false)
+                  }}
+                />
+              </>
+            </Form>
+          </View>
+        </View>
+      </Modal>
+    <>
+      
+    </>
+  );
+}
 
 const LoginName = () => {
   const [nom,setNom] = useState("");
