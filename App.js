@@ -103,6 +103,44 @@ function App () {
 }
 
 
+const HoweworkForm = () => {
+  const [nom,setNom] = useState("");
+  const [prenom,setPrenom] = useState("");
+  nomProp = nom;
+  prenomProp = prenom;
+  console.log(nom,prenom)
+  return(
+    <>
+      <FormItem
+        textInputStyle={styles.input}
+        labelStyle={styles.label}
+        label="Titre :"
+        isRequired
+        value={nom}
+        onChangeText={setNom}
+      />
+      <FormItem
+        textInputStyle={styles.input}
+        labelStyle={styles.label}
+        label="Description :"
+        isRequired
+        value={prenom}
+        onChangeText={setPrenom}
+      />
+      <FormItem
+        textInputStyle={styles.input}
+        labelStyle={styles.label}
+        label="A rendre le :"
+        isRequired
+        value={prenom}
+        onChangeText={setPrenom}
+      />
+    </>
+  );
+}
+
+
+
 const LoginName = () => {
   const [nom,setNom] = useState("");
   const [prenom,setPrenom] = useState("");
