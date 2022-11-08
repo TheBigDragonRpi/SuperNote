@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal,TextInput, Pressable, FlatList, ScrollView, Text, View,TouchableOpacity } from "react-native";
+iimport { Modal,TextInput, Pressable, FlatList, ScrollView, Text, View,TouchableOpacity } from "react-native";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import CheckBox from 'expo-checkbox';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -610,12 +610,3 @@ function Homework({item}) {
       <Graded graded={item["graded"]}/>
     </View>
   </View>
-)};
-const Documents = () => (
-  <View style={styles.DocContainer}>
-    
-  </View>
-);
-
-
-export default App;
