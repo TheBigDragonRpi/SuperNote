@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-iimport { Modal,TextInput, Pressable, FlatList, ScrollView, Text, View,TouchableOpacity } from "react-native";
+import { Modal,Button,TextInput, Pressable, FlatList, ScrollView, Text, View,TouchableOpacity } from "react-native";
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import CheckBox from 'expo-checkbox';
 import { LinearGradient } from 'expo-linear-gradient';
 import RNU from 'react-native-units'
 import { Form, FormItem, Picker } from 'react-native-form-component';
 import RadioForm from 'react-native-radio-form';
+import ToggleSwitch from 'toggle-switch-react-native'
+import DatePicker from 'react-native-date-picker'
+
 
 import styles from './styles/main'
 
@@ -19,7 +22,7 @@ var speProp = {}
 var langueProp = ''
 var optionProp = ''
 
-function sendUser(reload) {
+function sendUser(reload,valR) {
   console.log(server+`users/add?name=${nomProp}&fname=${prenomProp}&classe=${classeProp}&langue=${langueProp}&option=${optionProp}&maths=${speProp.Maths}&physique_chimie=${speProp['Physique-Chimie']}&nsi=${speProp.NSI}&svt=${speProp.SVT}&llce=${speProp.LLCE}&hggsp=${speProp.HGGSP}&ses=${speProp.SES}&hlp=${speProp.HLP}`)
   try{
     
@@ -35,7 +38,7 @@ function sendUser(reload) {
          // ADD THIS THROW error
           throw error;
       })
-      .finally(() => reload());
+      .finally(() => {reload(!valR)});
        //re render body
       //.catch((error) => console.log(error))
       //.finally(() => {
@@ -72,72 +75,197 @@ function sendUser(reload) {
 
 var user = {
   classe:"1D",
-  first_name:"John",
-  name:"Doe",
-  spe:{
-    'Maths':true,
-    'HGGSP':false,
-    'HLP':false,
-    'Physique-Chimie':true,
-    'SVT':false,
-    'SES':false,
-    'NSI':true,
-    'LLCE':false,
-  },
-  langue: 'Allemand',
-  option: 'Latin',
+  first_name:"First Name",
+  name:"Name",
+  spe:{"Maths":true,"HGGSP":false,"HLP":false,"Physique-Chimie":true,"SVT":false,"SES":false,"NSI":true,"LLCE":false},
+  langue:"Allemand",
+  option:"∅",
   isTeacher:false,
-  teacher:{}
-};
+  teacher:{},
+  id:"23014af3-dee5-4629-a7c2-96ba40aa12f9"
+}
 
 
 
 function App () {
-  const [nothing,reload] = useState(false);//
+  const [valR,reload] = useState(false);
+  const [homeworkAdd,setHomeworkAdd] = useState(false);
+  const [homeworkVisibility,setHomeworkVisibility] = useState(false);
+  const [hwId,setHwId] = useState(false);
+  console.log(homeworkAdd)
   return(
   <>
-    <PopUp reload={reload}/>
-    <Carousel/>
+    <PopUp reload={reload} valR={valR}/>
+    <HomeworkAddView visible={homeworkAdd} setVisible={setHomeworkAdd} reload={reload} valR={valR} loadHw={setHwId}/>
+    <HomeworkView visible={homeworkVisibility} setVisible={setHomeworkVisibility} id={hwId}/>
+    <Carousel homeworkAdd={homeworkAdd} setHomeworkAdd={setHomeworkAdd} setHomeworkVisible={setHomeworkVisibility}/>
   </>
   );
 }
 
 
-const HoweworkForm = () => {
-  const [nom,setNom] = useState("");
-  const [prenom,setPrenom] = useState("");
-  nomProp = nom;
-  prenomProp = prenom;
-  console.log(nom,prenom)
+const HomeworkView = (props) => { // pass hooks : ?visible
+  const [loaded,setLoaded] = useState(false);
+  if (loaded) {
+    return(
+      <Modal
+          animationType="slide"
+          transparent={false}
+          visible={props.visible}
+          onRequestClose={() => {
+            props.setVisible(false);
+          }}
+          shouldComponentUpdate={()=>{return false;}}
+        >
+          <ScrollView>
+          <View style={styles.centeredView} shouldComponentUpdate={()=>{return false;}}>
+            <View style={styles.modalView} shouldComponentUpdate={()=>{return false;}}>
+              
+            </View>
+          </View>
+          </ScrollView>
+        </Modal>
+    );
+  }else{
+    return(
+      <Modal
+          animationType="slide"
+          transparent={false}
+          visible={props.visible}
+          onRequestClose={() => {
+            props.setVisible(false);
+          }}
+          shouldComponentUpdate={()=>{return false;}}
+        >
+          <ScrollView>
+          <View style={styles.centeredView} shouldComponentUpdate={()=>{return false;}}>
+            <View style={[]} shouldComponentUpdate={()=>{return false;}}>
+              <Text>Loading...</Text>
+            </View>
+          </View>
+          </ScrollView>
+        </Modal>
+    );
+  }
+}
+
+const HomeworkAddView = (props) => { // pass hooks : ?visible
+  const [course,setCourse] = useState("Maths"); // pass default value through props
+  const [title,setTitle] = useState("");
+  const [description,setDescription] = useState("");
+  const [isEval,setIsEval] = useState(false);
+  const [isGraded,setIsGraded] = useState(false);
+  const [date, setDate] = useState(new Date())
+  const [open, setOpen] = useState(false)
+
   return(
-    <>
-      <FormItem
-        textInputStyle={styles.input}
-        labelStyle={styles.label}
-        label="Titre :"
-        isRequired
-        value={nom}
-        onChangeText={setNom}
-      />
-      <FormItem
-        textInputStyle={styles.input}
-        labelStyle={styles.label}
-        label="Description :"
-        isRequired
-        value={prenom}
-        onChangeText={setPrenom}
-      />
-      <FormItem
-        textInputStyle={styles.input}
-        labelStyle={styles.label}
-        label="A rendre le :"
-        isRequired
-        value={prenom}
-        onChangeText={setPrenom}
-      />
-    </>
+    <Modal
+        animationType="slide"
+        transparent={true}
+        visible={props.visible}
+        onRequestClose={() => {
+          props.setVisible(false);
+        }}
+        shouldComponentUpdate={()=>{return false;}}
+      >
+        <ScrollView>
+        <View style={styles.centeredView} shouldComponentUpdate={()=>{return false;}}>
+          <View style={styles.modalView} shouldComponentUpdate={()=>{return false;}}>
+            <Text style={styles.modalTitle} >DEVOIR</Text>
+            <Form 
+              onButtonPress={() => {
+                console.log(server+`homeworks/create?id=${user.id}&classe=${user.classe}&title=${title}&graded=${isGraded}&course=${course}&description=${description}&due_date=${date}`)
+                fetch(server+`/homeworks/create?id=${user.id}&classe=${user.classe}&title=${title}&graded=${isGraded}&course=${course}&description=${description}&due_date=${date}`)
+                    .then((response) => response.json())
+                    .then((json) => {console.log(json);})
+                    .catch((error) => console.log(error))
+                    .finally(() => {
+                      props.setVisible(false);
+                      props.reload(!valR);
+                    })
+                      
+              }}
+              buttonTextStyle={styles.textStyle}
+              buttonStyle={[styles.button, styles.buttonClose]}
+              buttonText="Add homework"
+              shouldComponentUpdate={()=>{return false;}}
+            >
+              <View style={{
+                display :'flex',
+                justifyContent :'flex-start',
+                flexDirection:'row',
+                marginBottom:10
+              }}>
+                <ToggleSwitch
+                  isOn={isEval}
+                  onColor="#6bd152"
+                  offColor="#f01411"
+                  label="Eval : "
+                  labelStyle={{ color: "black", fontWeight: "900" }}
+                  size="medium"
+                  onToggle={setIsEval}
+                />
+                <ToggleSwitch
+                  isOn={isGraded}
+                  onColor="#6bd152"
+                  offColor="#f01411"
+                  label="Noté : "
+                  labelStyle={{ color: "black", fontWeight: "900" }}
+                  size="medium"
+                  onToggle={setIsGraded}
+                />
+              </View>
+              <FormItem
+                textInputStyle={styles.input}
+                labelStyle={styles.label}
+                label="Titre :"
+                isRequired
+                value={title}
+                onChangeText={setTitle}
+              />
+              <Picker
+                items={[...Object.keys(user.spe).filter((k)=>{if(user.spe[k]){return k}}),...troncComnmun,user.langue,user.option].map(n=>{return({label:n,value:n})})} // [{label,value},...]
+                label="Course :"
+                isRequired
+                selectedValue={course}
+                style={styles.input}
+                itemStyle={styles.input}
+                onSelection={item => setCourse(item.value)}
+              />
+              
+              <FormItem
+                textInputStyle={styles.input}
+                labelStyle={styles.label}
+                label="Description :"
+                isRequired
+                value={description}
+                onChangeText={setDescription}
+                textArea={true}
+              />
+              <FormItem
+                textInputStyle={styles.input}
+                labelStyle={styles.label}
+                label="Date :"
+                isRequired
+                value={date}
+                onChangeText={setDate}
+              />
+            </Form>
+            <TouchableOpacity activeOpacity={0.7} style={styles.touchableCancelButton} onPress={() => {props.setVisible(false)}}>
+              <Text style={{fontSize:14*1,color:'#f01411',lineHeight:48/3,alignSelf:'center',}}>Annuler</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        </ScrollView>
+      </Modal>
   );
 }
+/*
+              
+              
+              
+              
+*/
 
 
 
@@ -352,7 +480,7 @@ const ContentModalForm = (props) => {
   else if (props.content == 2){return(<LoginClasse/>)}
   else if (props.content == 3){return(<LoginSpe/>)}
   else if (props.content == 4){return(<LoginOpt/>)}
-  else if (props.content == 5){return(<LoginLang reload={props.reload}/>)}
+  else if (props.content == 5){return(<LoginLang reload={props.reload} valR={props.valR}/>)}
 }
 
 const PopUp = (props) => {
@@ -376,7 +504,7 @@ const PopUp = (props) => {
                 props.NextSetvisible(true);
                 if(props.content>=5){
                   console.log("Callback !!")
-                  props.callback(props.reload)
+                  props.callback(props.reload,props.valR)
                 };
               }}
               buttonTextStyle={styles.textStyle}
@@ -384,7 +512,7 @@ const PopUp = (props) => {
               buttonText="Next"
               shouldComponentUpdate={()=>{return false;}}
             >
-              <ContentModalForm content = {props.content} reload={props.reload}/>
+              <ContentModalForm content = {props.content} reload={props.reload} valR={props.valR}/>
             </Form>
             <View style={styles.progressbar}>
               <View style={props.content<1?styles.dotG:styles.dot}/>
@@ -420,7 +548,7 @@ const PopUp = (props) => {
             <Pop visible={modal2Visible} Setvisible={setModal2Visible} NextSetvisible={setModal3Visible} content={2}/>
             <Pop visible={modal3Visible} Setvisible={setModal3Visible} NextSetvisible={setModal4Visible} content={3}/>
             <Pop visible={modal4Visible} Setvisible={setModal4Visible} NextSetvisible={setModal5Visible} content={4}/>
-            <Pop visible={modal5Visible} Setvisible={setModal5Visible} NextSetvisible={setEmpty} content={5} callback={sendUser} reload={props.reload}/>
+            <Pop visible={modal5Visible} Setvisible={setModal5Visible} NextSetvisible={setEmpty} content={5} callback={sendUser} reload={props.reload} valR={props.valR}/>
         </>
       )
     }
@@ -452,7 +580,7 @@ const aOrb = () => {
   }
   return (new Date()).getWeek()%2!=0 ? 'a' : 'b'
 }
-function Carousel () {
+function Carousel (props) {
   const [dataCourses, setDataCourses] = useState({})
   const [loading, setLoading] = useState(true)
   const today = GetDay();
@@ -497,11 +625,14 @@ function Carousel () {
                 //return(<Text key={course.start.h+course.start.m}>{course.course[0]}</Text>) // create element to process data
                 return(
                   <Main 
+                    homeworkAdd = {props.homeworkAdd}
+                    setHomeworkAdd = {props.setHomeworkAdd}
                     key = {course.start.h+course.start.m}
                     course = {chooseCourse(course.course)}
                     start = {course.start.h+"h"+course.start.m}
                     stop = {course.stop.h+"h"+course.stop.m}
                     classe = {course.class[chooseCourse(course.course)]}
+                    setHomeworkVisible = {props.setHomeworkVisible}
                   />) ////// not [0], have to choose from spes ////////
               })
             }
@@ -518,14 +649,14 @@ function Main (props)  {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const Hw = () => {
-    try{return(Object.values(data).map((item) => <Homework item={item} key={item.id}/>))}catch{return}
+    try{return(Object.values(data).map((item) => <Homework item={item} setHomeworkVisible={props.setHomeworkVisible} key={item.id}/>))}catch{return}
   }
 
   useEffect(() => {
     console.log("fetching from ",server+`homeworks/get?classe=${user.classe}&course=${props.course}`)
     fetch(server+`homeworks/get?classe=${user.classe}&course=${props.course}`)
       .then((response) => response.json())
-      .then((json) => setData(json))
+      .then((json) => {console.log(json);return(setData(json));})
       .catch((error) => console.log(error))
       .finally(() => {setLoading(false)});
   }, []);
@@ -559,7 +690,7 @@ function Main (props)  {
                       <View style={styles.bottom}>
                         <View style={styles.subTitles}><Text>Devoirs :</Text></View>
                         <ScrollView horizontal={true} style={[styles.scrollerH,]}>
-                          <Hw/>
+                          <Hw setHomeworkVisible={props.setHomeworkVisible}/>
                         </ScrollView>
                         <View style={styles.subTitles}><Text>Documents :</Text></View>
                         <ScrollView style={{width: RNU.vw(100),position:'relative',left:-30,}}>
@@ -578,7 +709,7 @@ function Main (props)  {
                     </LinearGradient>
                   </ScrollView>
                   <View style={styles.centerBtn}>
-                        <TouchableOpacity activeOpacity={0.7} style={styles.touchableOpacityStyle}>
+                        <TouchableOpacity activeOpacity={0.7} style={styles.touchableOpacityStyle} onPress={() => {props.setHomeworkAdd(!props.homeworkAdd)}}>
                           <Text style={{fontSize:14*3,color:'white',lineHeight:48,alignSelf:'center',}}>+</Text>
                         </TouchableOpacity>
                   </View>
@@ -596,17 +727,28 @@ function Graded(props) {
   }
   return;
 }
-function Homework({item}) {
-  console.log(item.id);
+function Homework(props) {
+  console.log(props.item.id);
   return(
-  <View style={styles.HWcontainer} key={item.id}>
-    <View style={styles.titleHW}>
-      <Text>{item["title"]}</Text>
-    </View>
-    <View style={styles.bottomCard}>
-      <View style={styles.dueDate}>
-        <Text>{item["due_date"]}</Text>
+  <TouchableOpacity  activeOpacity={0.9} style={[]} onPress={() => {props.setHomeworkVisible(true)}}>
+    <View style={styles.HWcontainer} key={props.item.id}>
+      <View >
+        <Text style={styles.titleHW}>{props.item["title"]}</Text>
       </View>
-      <Graded graded={item["graded"]}/>
+      <View style={styles.bottomCard}>
+        <View>
+          <Text style={styles.dueDate}>{props.item["due_date"]}</Text>
+        </View>
+        <Graded graded={props.item["graded"]}/>
+      </View>
     </View>
+  </TouchableOpacity>
+)};
+const Documents = () => (
+  <View style={styles.DocContainer}>
+    
   </View>
+);
+
+
+export default App;
